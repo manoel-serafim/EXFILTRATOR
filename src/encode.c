@@ -4,9 +4,10 @@
 #include <math.h>
 
 typedef unsigned char BYTE;
+//struct to define pixel and list
 
 // Function to calculate the standard deviation of colors in a 3x3 window
-double calculateStandardDeviation(BYTE window[3][3][3]) {
+double calc_variance(BYTE window[3][3][3]) { //pass it through in order to find entropy of file and stor in list
     double sum = 0.0, mean, standardDeviation = 0.0;
     int i, j, k;
     int count = 0;
@@ -40,7 +41,7 @@ void embedDataAdaptive(FILE *image, FILE *data, FILE *output, int width, int hei
     fwrite(header, sizeof(BYTE), 54, output); // Write BMP header
 
     // Memory allocation for image data
-    BYTE *imageBuffer = malloc(width * height * 3); 
+    BYTE *imageBuffer = malloc(width * height * 3); // Tree bytes per pixel
     BYTE *dataBuffer = malloc(width * height);  
     fread(imageBuffer, 3, width * height, image); // Read image data
 
@@ -61,8 +62,9 @@ void embedDataAdaptive(FILE *image, FILE *data, FILE *output, int width, int hei
                 }
             }
 
-            double complexity = calculateStandardDeviation(window);
+            double complexity = calc_variance(window);
             int bitsToEmbed = complexity / 85 + 1; // Adaptive approach
+            printf("%d, was embeded into the coordinate x:%d, y:%d", x,y );
 
             // Embed data based on complexity
             int pixelIndex = (y * width + x) * 3;

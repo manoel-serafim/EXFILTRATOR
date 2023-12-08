@@ -1,6 +1,7 @@
 # EXFILTRATOR
 Advanced Data Extraction &amp; Security Tool. Designed for secure, discreet data retrieval, it employs steganography and asymmetric encryption techniques to obscure data flows, significantly reducing detectability in compromised systems. Ideal for sensitive operations, ensuring data movement remains hidden and protected. It will be the intersection with criptology.
 
+This implementation will only use native libraries in order to obfuscate the static analisys of the imported functions.
 
 **Disclaimer**
 

@@ -23,7 +23,6 @@ void disembed(char* path) {
     p_secret data = gen_empty_secret();
 
     double highest_var = max_var(image);
-    printf("HIGHEST VARIANCE: %lf\n", highest_var);
     data->buffer_index = 0;
     data->bit_index = 0;
 

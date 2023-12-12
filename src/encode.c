@@ -31,7 +31,6 @@ void embed(char* img_path, char* file_path) {
     fwrite(image->header, sizeof(BYTE), 54, output); // Write BMP header
     
     double highest_var = max_var(image);
-    printf("HIGHEST VARIANCE: %lf\n", highest_var);
     // Process each pixel
 
     for (int y = 1; y < image->height - 1; y++) {

@@ -11,9 +11,9 @@ int main(int argc, char *argv[]) {
         return 1;
     }
     
-    embed(argv[1], argv[2]);
+    embed(argv[1], argv[2],"output.bmp");
 
-    disembed("output.bmp");
+    disembed("output.bmp", "output.bin");
     
 
     return 0;

@@ -21,12 +21,12 @@ p_secret get_secret_data(char* path){
 
 
 // Function to embed data into the image adaptively
-void embed(char* img_path, char* file_path) {
+void embed(char* img_path, char* file_path, char* output_name) {
 
     p_image image = get_image_data(img_path);
     p_secret data = get_secret_data(file_path);
 
-    FILE *output = fopen("output.bmp", "wb");
+    FILE *output = fopen(output_name, "wb");
 
     fwrite(image->header, sizeof(BYTE), 54, output); // Write BMP header
     
@@ -65,17 +65,19 @@ void embed(char* img_path, char* file_path) {
                     for (int i = 0; i < bitsToEmbed; i++) {
                         // Embed the ith bit from data->buffer into the LSB of the color channel
                         image->buffer[pix_addr + channel] &= ~(1 << i); // zero i-th bit
-                        image->buffer[pix_addr + channel] |= ((( *(data->buffer+data->buffer_index+data->bit_index)) >> i) & 1) << i; // 
+                        image->buffer[pix_addr + channel] |= (((data->buffer[data->buffer_index]) >> data->bit_index) & 1) << i; // 
 
                         // Increment the number of bits embedded
                         data->bit_index++;
-
                         // If 8 bits have been embedded, move to the next byte in data->buffer
-                        if (data->bit_index > 7) {
+                        if (data->bit_index == 8) {
+                            
                             data->buffer_index++;
                             data->bit_index = 0; // Reset the counter for the next byte
                         }
                     }
+                    
+                    
                 }
             }else{
                 fwrite(image->buffer, 3, image->height*image->width, output); // Write modified image data

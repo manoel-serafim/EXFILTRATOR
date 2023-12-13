@@ -5,6 +5,9 @@ p_image get_image_data(char* path){
     //ERROR HANDELING OF ALL FUNCTIONS
     p_image img = malloc(sizeof(struct img_struct));
     img->data_stream = fopen(path, "rb");
+    if (img->data_stream == NULL){
+        perror("fopen() error:");
+    }
 
     // Extract image dimensions from BMP header
     fseek(img->data_stream, 18, SEEK_SET);

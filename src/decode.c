@@ -2,29 +2,22 @@
 #include "complexity.h"
 
 
-//decode
-p_secret gen_empty_secret(){
-    //ERROR HANDELING OF all functions
-    p_secret ckrt = malloc(sizeof(struct secret_struct));
-    ckrt->data_stream = fopen("output.bin", "wb");
-    ckrt->buffer= malloc(sizeof(BYTE)+1);
-    ckrt->buffer_index = 0;
-    ckrt->buffer[ckrt->buffer_index] = '0';
-    ckrt->bit_index = 0;
-    ckrt->size =0;
-    return ckrt;
-}
 
 
-
-void disembed(char* path) {
+void disembed(char* path, char* output_name) {
     
     p_image image = get_image_data(path);
-    p_secret data = gen_empty_secret();
 
     double highest_var = max_var(image);
-    data->buffer_index = 0;
-    data->bit_index = 0;
+
+    BYTE value = 0;
+    int bit_count=0;
+
+    FILE* output = fopen(output_name, "wb");
+    if(output == NULL){
+        perror("fopen() error:");
+    }
+
 
     for (int y = 1; y < image->height - 1; y++) {
         for (int x = 1; x < image->width - 1; x++) {
@@ -47,28 +40,35 @@ void disembed(char* path) {
             int pix_addr = (y * image->width + x) * 3;
 
             for (int channel = 0; channel < 3; channel++) {
+                
+                
                 for (int i = 0; i < bitsToDisembed; i++) {
+                    
+
                     // Extract the ith bit from the LSB of the color channel
                     int extractedBit = (image->buffer[pix_addr + channel] >> i) & 1;
 
-                    *(data->buffer) |= (extractedBit << data->bit_index);//here is giving a segfault
+                    value |= (extractedBit << bit_count);//here is giving a segfault
                     // Increment the number of bits extracted
-                    data->bit_index++;
+                    bit_count++;
 
                     // If 8 bits have been extracted, move to the next byte in data->buffer
-                    if (data->bit_index == 8 ) {
-                        printf("data:%s",data->buffer[data->buffer_index]);
-                        fwrite(&data->buffer[data->buffer_index], 1, 1, data->data_stream);
+                    if (bit_count == 8 ) {
+                        fwrite(&value, 1, 1, output);
                         // Write the extracted byte to the output file
-                        data->bit_index = 0; // Reset the counter for the next byte
+                        value = 0;
+                        bit_count = 0; // Reset the counter for the next byte
 
-                        if (data->buffer_index >= data->size) {
-                            fclose(data->data_stream);
-                            return;
-                        }
+                        
                     }
                 }
             }
         }
     }
+
+    fclose(image->data_stream);
+    free(image->buffer);
+    free(image);
+
+    fclose(output); 
 }

@@ -51,6 +51,57 @@ Exfiltrator offers options for fine-tuning the steganography process, allowing u
 ![Embed Process](output/canary_diff.bmp)  *(Example Image Showing picture with Embedded Data)*
 
 
+
+---
+
+There is also a main.c implementation of a program that uses exfiltrator and in the bin/exfilter, the compiled program that has the following usage
+
+## Usage
+
+Exfiltrate is equipped with two primary modes of operation: `hide` and `show`. These modes are used for embedding data into an image and extracting data from an image, respectively.
+
+### Hide Mode
+
+In `hide` mode, Exfiltrator embeds specified data into a given image. This mode is ideal for securely concealing data within an image file.
+
+#### Command Format
+```
+exfilter --mode hide <input.bmp> <file_to_hide> <output.bmp>
+```
+
+- `input.bmp`: The source BMP image file in which the data will be hidden.
+- `file_to_hide`: The file containing the data you wish to embed in the image.
+- `output.bmp`: The output BMP image file with the hidden data embedded.
+
+#### Example
+```
+exfilter --mode hide input.bmp secret.txt output.bmp
+```
+
+This command will take `secret.txt`, embed its contents into `input.bmp`, and produce `output.bmp` with the data securely hidden inside.
+
+### Show Mode
+
+In `show` mode, Exfiltrator extracts the hidden data from the specified image. This mode is used to retrieve the data previously embedded into an image file.
+
+#### Command Format
+```
+exfilter --mode show <input.bmp> <output_file>
+```
+
+- `input.bmp`: The BMP image file from which the data is to be extracted.
+- `output_file`: The file where the extracted data will be saved.
+
+#### Example
+```
+exfilter --mode show output.bmp extracted_data.txt
+```
+
+This command will extract the hidden data from `output.bmp` and save it in `extracted_data.txt`.
+
+---
+
+
 **Disclaimer**
 
 The software is provided "as is", without warranty of any kind, express or implied, including but not limited to the warranties of merchantability, fitness for a particular purpose, and non-infringement. In no event shall the authors, copyright holders, or contributors be liable for any claim, damages, or other liability, whether in an action of contract, tort, or otherwise, arising from, out of, or in connection with the software or the use or other dealings in the software. This software is not intended for use in any unlawful manner or context. Users are responsible for ensuring their use of the software complies with all applicable laws and regulations.

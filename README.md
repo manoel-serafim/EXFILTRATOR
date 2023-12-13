@@ -27,7 +27,7 @@ The `embed` function in Exfiltrator is designed to hide data within an image in 
     - Bits of the secret data are embedded into the least significant bits (LSBs) of the pixels in the complex regions.
     - The embedding is done using bitwise operations, ensuring that the visual impact on the image is minimal.
 
-![Embed Process](/output/canary_bin.bpm)  *(Example Image Showing picture with Embedded Data)*
+![Embed Process](output/canary_bin.bmp)  *(Example Image Showing picture with Embedded Data)*
 
 #### Disembed Function
 

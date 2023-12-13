@@ -101,6 +101,41 @@ This command will extract the hidden data from `output.bmp` and save it in `extr
 
 ---
 
+# README: Exfiltrator vs Steghide Experiment - Detailed Analysis
+
+## Overview
+
+This experiment aimed to compare the performance and stealth characteristics of Exfiltrator with Steghide, a popular steganography tool that uses LSB. The focus was on how each tool embeds data into an image and the resulting detectability of modifications.
+
+## Key Differences in Methodology
+
+### Steghide:
+- **LSB Technique**: Steghide primarily uses the Least Significant Bit (LSB) method for embedding data. This approach involves altering the LSBs of pixel data to store information.
+- **Scattered Output**: The data embedding by Steghide tends to be scattered across the image. While this method can distribute data evenly, it can also make the changes more predictable and potentially more detectable, especially in images with large uniform color areas.
+![Embed Process](experiment/dogdiffsteg.bmp)  *(Steghide difference from Original Image)*
+
+
+### Exfiltrator:
+- **Adaptive Steganography**: Exfiltrator utilizes an adaptive steganography technique that is based on the variance and complexity of the image. It analyzes different regions of the image to identify areas of high complexity where changes are less noticeable.
+- **Variance-Related Data Embedding**: Unlike Steghide, Exfiltrator does not have a set number of bits for embedding across the entire image. Instead, the number of bits embedded in each region is related to the variance and the image's overall distribution. This means that more bits are embedded in areas of higher complexity, making changes less perceptible.
+![Embed Process](experiment/dogdiffours.bmp)  *(Exfilter difference from Original Image)*
+
+## Experiment Log and Observations
+
+During the experiment, we observed:
+
+- **Steghide Results**: In `dog_steg.bmp`, the modifications made by Steghide were more discernible when the image was compared to the original, as seen in `experiment/dogdiffsteg.bmp`. The changes were more scattered but predictable due to the LSB technique.
+
+- **Exfiltrator Results**: The `dog_ours.bmp` image, modified by Exfiltrator, displayed subtler alterations. The comparison output in `experiment/dogdiffours.bmp` demonstrated that the changes were less noticeable, aligning with the areas of higher complexity in the image.
+
+## Conclusion
+
+The adaptive steganography approach of Exfiltrator, which bases data embedding on image variance, proves to be more effective for discreet embedding compared to the LSB method used by Steghide. Exfiltrator's technique ensures that the embedded data is less detectable, making it more suitable for scenarios where high-level concealment is required.
+
+## Further Considerations
+
+Additional research could explore the impact of Exfiltrator's method on various types of images, including those with different levels of complexity and color distribution. Experimenting with different types and sizes of data could also provide a more comprehensive understanding of the tool's versatility and effectiveness in diverse applications.
+
 
 **Disclaimer**
 

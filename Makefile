@@ -27,12 +27,16 @@ clean:
 	rm -f $(OBJS) $(BIN_DIR)/exfilter
 
 # Phony target for testing
-test: $(BIN_DIR)/exfilter
+test_canary: $(BIN_DIR)/exfilter
 	./$(BIN_DIR)/exfilter --mode hide img_samples/canary.bmp bin/exfilter output/canary_bin.bmp
 	compare output/canary_bin.bmp img_samples/canary.bmp output/canary_diff.bmp
-	./$(BIN_DIR)/exfilter --mode hide img_samples/cat.bmp bin/exfilter output/cat_bin.bmp
+
+test_cat: $(BIN_DIR)/exfilter
+	./$(BIN_DIR)/exfilter --mode hide img_samples/cat.bmp utils/files/smallfile output/cat_bin.bmp
 	compare output/cat_bin.bmp img_samples/cat.bmp output/cat_diff.bmp
+	
+test_dog: $(BIN_DIR)/exfilter	
 	./$(BIN_DIR)/exfilter --mode hide img_samples/dog.bmp bin/exfilter output/dog_bin.bmp
 	compare output/dog_bin.bmp img_samples/dog.bmp output/dog_diff.bmp
 
-.PHONY: all clean test
+.PHONY: all clean test_canary test_cat test_dog

@@ -84,6 +84,7 @@ void embed(const char * img_path, const char * file_path, const char * output_na
         free(image); // Free previously allocated image struct
         return;
     }
+    
 
     FILE *output = fopen(output_name, "wb");
     if (output == NULL) {
@@ -104,6 +105,7 @@ void embed(const char * img_path, const char * file_path, const char * output_na
         free(data);
         return;
     }
+    
     int data_embedded = 0;
     double highest_var = max_var(image);
     // Process each pixel
@@ -155,6 +157,7 @@ void embed(const char * img_path, const char * file_path, const char * output_na
                     
                 }
             }else{
+                 
                 data_embedded = 1;
                 break;
             }

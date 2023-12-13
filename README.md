@@ -48,6 +48,8 @@ The `embed` and `disembed` functions demonstrate Exfiltrator's ability to utiliz
 ### Fine Tuning
 Exfiltrator offers options for fine-tuning the steganography process, allowing users to balance between the amount of data to be hidden and the level of visual discretion.
 
+![Embed Process](output/canary_diff.bmp)  *(Example Image Showing picture with Embedded Data)*
+
 
 **Disclaimer**
 

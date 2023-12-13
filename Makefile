@@ -28,7 +28,8 @@ clean:
 
 # Phony target for testing
 test_canary: $(BIN_DIR)/exfilter
-	./$(BIN_DIR)/exfilter --mode hide img_samples/canary.bmp bin/exfilter output/canary_bin.bmp
+	./$(BIN_DIR)/exfilter --mode hide img_samples/canary.bmp utils/files/bigfile output/canary_bin.bmp
+	./$(BIN_DIR)/exfilter --mode show output/canary_bin.bmp output/canary.bin
 	compare output/canary_bin.bmp img_samples/canary.bmp output/canary_diff.bmp
 
 test_cat: $(BIN_DIR)/exfilter

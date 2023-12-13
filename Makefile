@@ -28,11 +28,11 @@ clean:
 
 # Phony target for testing
 test: $(BIN_DIR)/exfilter
-	./$(BIN_DIR)/exfilter img_samples/canary.bmp src/encode.c
-	compare output.bmp img_samples/canary.bmp output/canary_diff.bmp
-	./$(BIN_DIR)/exfilter img_samples/cat.bmp src/encode.c
-	compare output.bmp img_samples/cat.bmp output/cat_diff.bmp
-	./$(BIN_DIR)/exfilter img_samples/dog.bmp src/encode.c
-	compare output.bmp img_samples/dog.bmp output/dog_diff.bmp
+	./$(BIN_DIR)/exfilter --mode hide img_samples/canary.bmp bin/exfilter output/canary_bin.bmp
+	compare output/canary_bin.bmp img_samples/canary.bmp output/canary_diff.bmp
+	./$(BIN_DIR)/exfilter --mode hide img_samples/cat.bmp bin/exfilter output/cat_bin.bmp
+	compare output/cat_bin.bmp img_samples/cat.bmp output/cat_diff.bmp
+	./$(BIN_DIR)/exfilter --mode hide img_samples/dog.bmp bin/exfilter output/dog_bin.bmp
+	compare output/dog_bin.bmp img_samples/dog.bmp output/dog_diff.bmp
 
 .PHONY: all clean test

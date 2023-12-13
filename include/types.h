@@ -24,6 +24,6 @@ struct secret_struct{
 };
 typedef struct secret_struct* p_secret;
 
-p_image get_image_data(char*);
+p_image get_image_data(const char *);
 
 #endif

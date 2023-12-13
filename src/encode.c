@@ -3,33 +3,108 @@
 
 
 
-p_secret get_secret_data(char* path){
-    //ERROR HANDELING OF all functions
+p_secret get_secret_data(const char* path) {
+    // Allocate memory for the secret structure
     p_secret ckrt = malloc(sizeof(struct secret_struct));
+    if (ckrt == NULL) {
+        perror("malloc() error for secret struct");
+        return NULL;
+    }
+
+    // Open the secret file
     ckrt->data_stream = fopen(path, "rb");
+    if (ckrt->data_stream == NULL) {
+        perror("fopen() error");
+        free(ckrt);
+        return NULL;
+    }
+
     // Determine the size of the data to embed
-    fseek(ckrt->data_stream, 0, SEEK_END);
+    if (fseek(ckrt->data_stream, 0, SEEK_END) != 0) {
+        perror("fseek() error");
+        fclose(ckrt->data_stream);
+        free(ckrt);
+        return NULL;
+    }
+
     ckrt->size = ftell(ckrt->data_stream);
-    fseek(ckrt->data_stream, 0, SEEK_SET);
-    ckrt->buffer = malloc(ckrt->size); 
-    fread(ckrt->buffer, 1, ckrt->size, ckrt->data_stream);
+    if (ckrt->size == -1) {
+        perror("ftell() error");
+        fclose(ckrt->data_stream);
+        free(ckrt);
+        return NULL;
+    }
+
+    if (fseek(ckrt->data_stream, 0, SEEK_SET) != 0) {
+        perror("fseek() error");
+        fclose(ckrt->data_stream);
+        free(ckrt);
+        return NULL;
+    }
+
+    // Allocate memory for the secret data buffer
+    ckrt->buffer = malloc(ckrt->size);
+    if (ckrt->buffer == NULL) {
+        perror("malloc() error for buffer");
+        fclose(ckrt->data_stream);
+        free(ckrt);
+        return NULL;
+    }
+
+    // Read the secret data
+    if (fread(ckrt->buffer, 1, ckrt->size, ckrt->data_stream) != ckrt->size) {
+        perror("fread() error");
+        fclose(ckrt->data_stream);
+        free(ckrt->buffer);
+        free(ckrt);
+        return NULL;
+    }
+
     ckrt->buffer_index = 0;
     ckrt->bit_index = 0;
+
+    fclose(ckrt->data_stream); // Close the file after reading
     return ckrt;
 }
 
 
 
 // Function to embed data into the image adaptively
-void embed(char* img_path, char* file_path, char* output_name) {
+void embed(const char * img_path, const char * file_path, const char * output_name) {
 
     p_image image = get_image_data(img_path);
+    if (image == NULL) {
+        fprintf(stderr, "Failed to load image data.\n");
+        return;
+    }
+
     p_secret data = get_secret_data(file_path);
+    if (data == NULL) {
+        fprintf(stderr, "Failed to load secret data.\n");
+        free(image); // Free previously allocated image struct
+        return;
+    }
 
     FILE *output = fopen(output_name, "wb");
+    if (output == NULL) {
+        perror("Failed to open output file");
+        free(image->buffer);
+        free(image);
+        free(data->buffer);
+        free(data);
+        return;
+    }
 
-    fwrite(image->header, sizeof(BYTE), 54, output); // Write BMP header
-    
+    if (fwrite(image->header, sizeof(BYTE), 54, output) != 54) {
+        perror("Failed to write BMP header to output file");
+        fclose(output);
+        free(image->buffer);
+        free(image);
+        free(data->buffer);
+        free(data);
+        return;
+    }
+    int data_embedded = 0;
     double highest_var = max_var(image);
     // Process each pixel
 
@@ -80,31 +155,33 @@ void embed(char* img_path, char* file_path, char* output_name) {
                     
                 }
             }else{
-                fwrite(image->buffer, 3, image->height*image->width, output); // Write modified image data
-                fclose(image->data_stream);
-                free(image->buffer);
-                free(image);
-
-                fclose(data->data_stream);
-                free(data->buffer);
-                free(data);
-
-                fclose(output);
-                return;
+                data_embedded = 1;
+                break;
             }
-            
+        }
+        if (data_embedded) {
+            break;
         }
     }
+
+    if (!data_embedded) {
+        fprintf(stderr, "[The image is too small to hide the whole file.]\n");
+        fprintf(stderr, "Maximum that could be embedded was %d bits.\n", (8*data->buffer_index)+data->bit_index);
+        fprintf(stderr, "Try adding an image with more complexity or separating the file into several images\n", (8*data->buffer_index)+data->bit_index);
+    }
+
+    // Write the modified image data to the output file
+    if (fwrite(image->buffer, 3, image->height * image->width, output) != image->height * image->width) {
+        perror("Failed to write modified image data to output file");
+    }
     
-    fclose(image->data_stream);
+
+    // Clean up resources
+    fclose(output);
     free(image->buffer);
     free(image);
-
-    fclose(data->data_stream);
     free(data->buffer);
     free(data);
-
-    fclose(output);
 }
 
 

@@ -4,7 +4,7 @@
 
 
 
-void disembed(char* path, char* output_name) {
+void disembed(const char * path, const char * output_name) {
     
     p_image image = get_image_data(path);
 

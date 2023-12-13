@@ -1,6 +1,7 @@
 {
     "files.associations": {
         "cmath": "c",
-        "encode.h": "c"
+        "encode.h": "c",
+        "decode.h": "c"
     }
 }

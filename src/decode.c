@@ -7,15 +7,21 @@
 void disembed(const char * path, const char * output_name) {
     
     p_image image = get_image_data(path);
-
+    if (image == NULL) {
+        fprintf(stderr, "Failed to load image data.\n");
+        return;
+    }
     double highest_var = max_var(image);
 
     BYTE value = 0;
     int bit_count=0;
 
     FILE* output = fopen(output_name, "wb");
-    if(output == NULL){
-        perror("fopen() error:");
+    if (output == NULL) {
+        perror("Error opening output file");
+        free(image->buffer);
+        free(image);
+        return;
     }
 
 
@@ -54,7 +60,14 @@ void disembed(const char * path, const char * output_name) {
 
                     // If 8 bits have been extracted, move to the next byte in data->buffer
                     if (bit_count == 8 ) {
-                        fwrite(&value, 1, 1, output);
+                        if (fwrite(&value, 1, 1, output) != 1) {
+                            perror("Error writing to output file");
+                            fclose(output);
+                            fclose(image->data_stream);
+                            free(image->buffer);
+                            free(image);
+                            return;
+                        }
                         // Write the extracted byte to the output file
                         value = 0;
                         bit_count = 0; // Reset the counter for the next byte
@@ -66,9 +79,7 @@ void disembed(const char * path, const char * output_name) {
         }
     }
 
-    fclose(image->data_stream);
     free(image->buffer);
     free(image);
-
     fclose(output); 
 }

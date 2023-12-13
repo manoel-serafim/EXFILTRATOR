@@ -1,7 +1,0 @@
-{
-    "files.associations": {
-        "cmath": "c",
-        "encode.h": "c",
-        "decode.h": "c"
-    }
-}

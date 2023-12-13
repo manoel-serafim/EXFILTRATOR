@@ -112,12 +112,14 @@ This experiment aimed to compare the performance and stealth characteristics of 
 ### Steghide:
 - **LSB Technique**: Steghide primarily uses the Least Significant Bit (LSB) method for embedding data. This approach involves altering the LSBs of pixel data to store information.
 - **Scattered Output**: The data embedding by Steghide tends to be scattered across the image. While this method can distribute data evenly, it can also make the changes more predictable and potentially more detectable, especially in images with large uniform color areas.
+  
 ![Embed Process](experiment/dogdiffsteg.bmp)  *(Steghide difference from Original Image)*
 
 
 ### Exfiltrator:
 - **Adaptive Steganography**: Exfiltrator utilizes an adaptive steganography technique that is based on the variance and complexity of the image. It analyzes different regions of the image to identify areas of high complexity where changes are less noticeable.
 - **Variance-Related Data Embedding**: Unlike Steghide, Exfiltrator does not have a set number of bits for embedding across the entire image. Instead, the number of bits embedded in each region is related to the variance and the image's overall distribution. This means that more bits are embedded in areas of higher complexity, making changes less perceptible.
+
 ![Embed Process](experiment/dogdiffours.bmp)  *(Exfilter difference from Original Image)*
 
 ## Experiment Log and Observations

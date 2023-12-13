@@ -96,6 +96,17 @@ void embed(const char * img_path, const char * file_path, const char * output_na
         return;
     }
 
+
+    //send size in header
+    uint16_t lowerPart = (uint16_t)(data->size & 0xFFFF);        // Lower 16 bits
+    uint16_t upperPart = (uint16_t)((data->size >> 16) & 0xFFFF); // Upper 16 bits
+
+    image->header[6] = lowerPart & 0xFF;
+    image->header[7] = (lowerPart >> 8) & 0xFF;
+    image->header[8] = upperPart & 0xFF;
+    image->header[9] = (upperPart >> 8) & 0xFF;
+
+
     if (fwrite(image->header, sizeof(BYTE), 54, output) != 54) {
         perror("Failed to write BMP header to output file");
         fclose(output);

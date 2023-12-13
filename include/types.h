@@ -17,7 +17,7 @@ typedef struct img_struct* p_image;
 
 struct secret_struct{
     FILE* data_stream;
-    int size;
+    uint32_t size;
     BYTE* buffer;
     int buffer_index;
     int bit_index;

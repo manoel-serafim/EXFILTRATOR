@@ -1,6 +1,6 @@
 #include "complexity.h"
 #include "types.h"
-
+#include "iterate.h"
 
 
 p_secret get_secret_data(const char* path) {
@@ -70,7 +70,7 @@ p_secret get_secret_data(const char* path) {
 
 
 // Function to embed data into the image adaptively
-void embed(const char * img_path, const char * file_path, const char * output_name) {
+void embed(const char * img_path, const char * file_path, const char * output_name, int mode) {
 
     p_image image = get_image_data(img_path);
     if (image == NULL) {
@@ -97,6 +97,9 @@ void embed(const char * img_path, const char * file_path, const char * output_na
     }
 
 
+    
+
+
     //send size in header
     uint16_t lowerPart = (uint16_t)(data->size & 0xFFFF);        // Lower 16 bits
     uint16_t upperPart = (uint16_t)((data->size >> 16) & 0xFFFF); // Upper 16 bits
@@ -116,62 +119,71 @@ void embed(const char * img_path, const char * file_path, const char * output_na
         free(data);
         return;
     }
-    
+
+   
+    //Create state variable for iterator
+
+    state s = {.mode = mode};
+    init(&s, image->width, image->height);
+    //FILE * debug_encode = fopen("debug_encode.txt", "w");
     int data_embedded = 0;
     double highest_var = max_var(image);
     // Process each pixel
+    cord c;
+    while(1)
+    {
+        c = yield(&s);
+        if(s.status == -1) break;
+        int y = c.y;
+        int x = c.x;
+        //fprintf(debug_encode, "x: %d, y:%d\n", c.x, c.y);
+         //will not use all bits for variance check , there will be canary bits
+        // use only the Xth MSB
+        BYTE window[3][3][3]; // 3x3 2D grid of pixels x3 for each pixel in each grid square
 
-    for (int y = 1; y < image->height - 1; y++) {
-        for (int x = 1; x < image->width - 1; x++) {
-            //will not use all bits for variance check , there will be canary bits
-            // use only the Xth MSB
-            BYTE window[3][3][3]; // 3x3 2D grid of pixels x3 for each pixel in each grid square
-
-            // Fill the window with pixel data
-            //dy dx are the offset from the pix
-            for (int dy = -1; dy <= 1; dy++) {
-                for (int dx = -1; dx <= 1; dx++) {
-                    int pix_pos = ((y + dy) * image->width + (x + dx)) * 3;
-                    for (int channel = 0; channel < 3; channel++) {
-                        window[dy + 1][dx + 1][channel] = image->buffer[pix_pos + channel];
-                    }
-                }
-            }
-
-            //should calculate the variance based on the first 5 MSB bits of each color chanel and never change them
-            double complexity = calc_variance(window);
-            int bitsToEmbed = (int)(round(complexity / (highest_var / 3)));
-            //printf("%d, was embeded into the coordinate x:%d, y:%d", x,y );
-            
-            // Embed data based on complexity
-            int pix_addr = (y * image->width + x) * 3;
-
-            
-            if (data->buffer_index < data->size) {
+        // Fill the window with pixel data
+        //dy dx are the offset from the pix
+        for (int dy = -1; dy <= 1; dy++) {
+            for (int dx = -1; dx <= 1; dx++) {
+                int pix_pos = ((y + dy) * image->width + (x + dx)) * 3;
                 for (int channel = 0; channel < 3; channel++) {
-                    // Embed bitsToEmbed bits into each channel
-                    for (int i = 0; i < bitsToEmbed; i++) {
-                        // Embed the ith bit from data->buffer into the LSB of the color channel
-                        image->buffer[pix_addr + channel] &= ~(1 << i); // zero i-th bit
-                        image->buffer[pix_addr + channel] |= (((data->buffer[data->buffer_index]) >> data->bit_index) & 1) << i; // 
-
-                        // Increment the number of bits embedded
-                        data->bit_index++;
-                        // If 8 bits have been embedded, move to the next byte in data->buffer
-                        if (data->bit_index == 8) {
-                            
-                            data->buffer_index++;
-                            data->bit_index = 0; // Reset the counter for the next byte
-                        }
-                    }
-                    
-                    
+                    window[dy + 1][dx + 1][channel] = image->buffer[pix_pos + channel];
                 }
-            }else{
-                 
-                data_embedded = 1;
-                break;
             }
+        }
+
+        //should calculate the variance based on the first 5 MSB bits of each color chanel and never change them
+        double complexity = calc_variance(window);
+        int bitsToEmbed = (int)(round(complexity / (highest_var / 3)));
+       // printf("%d, was embeded into the coordinate x:%d, y:%d", x,y );
+            
+        // Embed data based on complexity
+        int pix_addr = (y * image->width + x) * 3;
+
+            
+        if (data->buffer_index < data->size) {
+            for (int channel = 0; channel < 3; channel++) {
+                // Embed bitsToEmbed bits into each channel
+                for (int i = 0; i < bitsToEmbed; i++) {
+                    // Embed the ith bit from data->buffer into the LSB of the color channel
+                    image->buffer[pix_addr + channel] &= ~(1 << i); // zero i-th bit
+                    image->buffer[pix_addr + channel] |= (((data->buffer[data->buffer_index]) >> data->bit_index) & 1) << i; // 
+
+                    // Increment the number of bits embedded
+                    data->bit_index++;
+                    // If 8 bits have been embedded, move to the next byte in data->buffer
+                    if (data->bit_index == 8) {
+                            
+                        data->buffer_index++;
+                        data->bit_index = 0; // Reset the counter for the next byte
+                    }
+                }
+                    
+                    
+            }
+        }else{   
+            data_embedded = 1;
+            break;
         }
         if (data_embedded) {
             break;

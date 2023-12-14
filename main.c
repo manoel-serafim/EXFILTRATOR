@@ -2,14 +2,16 @@
 #include "libs.h"
 #include "encode.h"
 #include "decode.h"
-
+#include "iterate.h"
 void print_help(const char* program_name) {
     printf("Usage: %s --mode <hide|show> [additional arguments]\n\n", program_name);
     printf("Modes:\n");
     printf("  hide: Hides a file within a BMP image.\n");
-    printf("    Arguments: <input.bmp> <file_to_hide> <output.bmp>\n");
+    printf("    Arguments: <input.bmp> <file_to_hide> <output.bmp> [iterator]\n");
     printf("  show: Extracts a hidden file from a BMP image.\n");
-    printf("    Arguments: <input.bmp> <output_file>\n");
+    printf("    Arguments: <input.bmp> <output_file> [iterator]\n");
+    printf("  it: reverse, diagonal, seed\n");
+    printf("    Arguments: <iterator type> [seed]\n");
 }
 
 int main(int argc, char *argv[]) {
@@ -19,22 +21,63 @@ int main(int argc, char *argv[]) {
     }
 
     const char* mode = NULL;
+    const char* it = NULL;
     int mode_index = -1;
-
+    int it_index = -1;
+    MODE m = DEFAULT;
+    int seed;
     // Find the mode argument
     for (int i = 1; i < argc; i++) {
         if (strcmp(argv[i], "--mode") == 0 && i + 1 < argc) {
             mode = argv[i + 1];
             mode_index = i;
-            break;
+            it_index = mode_index;
+            continue;
+        }
+        if(strcmp(argv[i], "--it") == 0 && i + 1 < argc)
+        {
+            it = argv[i + 1];
+            it_index = i;
+            continue;
         }
     }
-
     if (mode == NULL) {
         fprintf(stderr, "Error: Missing '--mode' argument.\n");
         print_help(argv[0]);
         return 1;
     }
+    if(it != NULL)
+    {
+         if(strcmp(it, "reverse") == 0)
+        {
+            if (argc < it_index + 2) {
+                print_help(argv[0]);
+                return 1;
+            }
+            m = REVERSE;
+        }
+        if(strcmp(it, "diagonal") == 0)
+        {
+            if (argc < it_index + 2) {
+                print_help(argv[0]);
+                return 1;
+            }
+            m = DIAGONAL;
+        }
+        if(strcmp(it, "seed") == 0)
+        {
+            if (argc < it_index + 3) {
+                print_help(argv[0]);
+                return 1;
+            }
+
+            seed = atoi(argv[it_index + 2]);
+            srand(seed);
+            m = SEED;
+        }
+    }
+   
+   
 
     if (strcmp(mode, "hide") == 0) {
         if (argc < mode_index + 4) {
@@ -45,7 +88,7 @@ int main(int argc, char *argv[]) {
         const char *file_to_hide = argv[mode_index + 3];
         const char *output_image = argv[mode_index + 4];
 
-        embed(input_image, file_to_hide, output_image);
+        embed(input_image, file_to_hide, output_image, m);
 
     } else if (strcmp(mode, "show") == 0) {
         if (argc < mode_index + 3) {
@@ -55,7 +98,7 @@ int main(int argc, char *argv[]) {
         const char *input_image = argv[mode_index + 2];
         const char *output_file = argv[mode_index + 3];
 
-        disembed(input_image, output_file);
+        disembed(input_image, output_file, m);
 
     } else {
         fprintf(stderr, "Error: Invalid mode '%s'. Use 'hide' or 'show'.\n", mode);

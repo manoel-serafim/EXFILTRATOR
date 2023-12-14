@@ -8,7 +8,7 @@ BIN_DIR = bin
 SRC_DIR = src
 
 # List of source files
-SRCS = $(SRC_DIR)/encode.c $(SRC_DIR)/decode.c $(SRC_DIR)/complexity.c $(SRC_DIR)/types.c
+SRCS = $(SRC_DIR)/encode.c $(SRC_DIR)/decode.c $(SRC_DIR)/complexity.c $(SRC_DIR)/types.c $(SRC_DIR)/iterate.c
 OBJS = $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%.o,$(SRCS))
 
 # Main target

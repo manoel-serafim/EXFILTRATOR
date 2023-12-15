@@ -25,7 +25,8 @@ The `embed` function in Exfiltrator is designed to hide data within an image in 
 2. **Adaptive Data Embedding**:
     - Based on the complexity analysis, the algorithm decides the number of bits that can be safely embedded in each window.
     - Bits of the secret data are embedded into the least significant bits (LSBs) of the pixels in the complex regions.
-    - The embedding is done using bitwise operations, ensuring that the visual impact on the image is minimal.
+    - The embedding is done using bitwise operations, ensuring that the visual impact on the image is minimal.  
+    
 
 ![Embed Process](output/canary_bin.bmp)  *(Example Image Showing picture with Embedded Data)*
 
@@ -48,8 +49,19 @@ The `embed` and `disembed` functions demonstrate Exfiltrator's ability to utiliz
 ### Fine Tuning
 Exfiltrator offers options for fine-tuning the steganography process, allowing users to balance between the amount of data to be hidden and the level of visual discretion.
 
-![Embed Process](output/canary_diff.bmp)  *(Example Image Showing picture with Embedded Data inside of the picture and highlighted)*
+![Embed Process](output/canary_diff.bmp)  *(Example Image Showing picture with Embedded Data inside of the picture and highlighted using the default iterator type)*
 
+---
+
+![Embed Process](output/canary_reverse_diff.bmp)  *(Example Image Showing picture with Embedded Data inside of the picture and highlighted using the reverse iterator type)*
+
+--- 
+
+![Embed Process](output/canary_diagonal_diff.bmp)  *(Example Image Showing picture with Embedded Data inside of the picture and highlighted using the diagonal iterator type)*
+
+--- 
+
+![Embed Process](output/canary_seed_diff.bmp)  *(Example Image Showing picture with Embedded Data inside of the picture and highlighted using the seed iterator type)*
 
 
 ---
@@ -66,19 +78,21 @@ In `hide` mode, Exfiltrator embeds specified data into a given image. This mode 
 
 #### Command Format
 ```
-exfilter --mode hide <input.bmp> <file_to_hide> <output.bmp>
+exfilter --mode hide <input.bmp> <file_to_hide> <output.bmp> --it [iterator] [seed]
 ```
 
 - `input.bmp`: The source BMP image file in which the data will be hidden.
 - `file_to_hide`: The file containing the data you wish to embed in the image.
 - `output.bmp`: The output BMP image file with the hidden data embedded.
+- `iterator`: The iterator type used for bit yield, can be of types: default, reverse, diagonal, seed.
+- `seed`: The seed value used in the seed type iterator.
 
 #### Example
 ```
-exfilter --mode hide input.bmp secret.txt output.bmp
+exfilter --mode hide input.bmp secret.txt output.bmp --it default
 ```
 
-This command will take `secret.txt`, embed its contents into `input.bmp`, and produce `output.bmp` with the data securely hidden inside.
+This command will take `secret.txt`, embed its contents into `input.bmp` using the default iterator, and produce `output.bmp` with the data securely hidden inside.
 
 ### Show Mode
 
@@ -86,11 +100,13 @@ In `show` mode, Exfiltrator extracts the hidden data from the specified image. T
 
 #### Command Format
 ```
-exfilter --mode show <input.bmp> <output_file>
+exfilter --mode show <input.bmp> <output_file> --it [iterator]
 ```
 
 - `input.bmp`: The BMP image file from which the data is to be extracted.
 - `output_file`: The file where the extracted data will be saved.
+- `iterator`: The iterator type used to embed the saved data.
+
 
 #### Example
 ```
@@ -119,6 +135,8 @@ This experiment aimed to compare the performance and stealth characteristics of 
 ### Exfiltrator:
 - **Adaptive Steganography**: Exfiltrator utilizes an adaptive steganography technique that is based on the variance and complexity of the image. It analyzes different regions of the image to identify areas of high complexity where changes are less noticeable.
 - **Variance-Related Data Embedding**: Unlike Steghide, Exfiltrator does not have a set number of bits for embedding across the entire image. Instead, the number of bits embedded in each region is related to the variance and the image's overall distribution. This means that more bits are embedded in areas of higher complexity, making changes less perceptible.
+- **Iterator Types**: Exfiltrator allows the user to select different iterators that yield the bits in different order, this allows for some try and error such that the user can find a the iterator which results in minimal quality impact or denser embedding.
+- **Seed Embedding**: The iterator types feature also allows the embedding/encoding to be seeded, yielding the bits in a psuedorandom order that can only be decoded by using the same seed.
 
 ![Embed Process](experiment/dogdiffours.bmp)  *(Exfilter difference from Original Image)*
 

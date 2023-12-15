@@ -85,7 +85,7 @@ cord yield(state *s)
     if(s->mode == DIAGONAL)
     {
         
-        if(s->diag == 2 && s->current_x == s->width - 2 && s->dir == -1) s->status = -1;
+        if(s->current_x == s->width - 2 && s->current_y == s->height - 2) s->status = -1;
         int next_x = ++s->current_x;
         int next_y = --s->current_y;
         if(s->dir == 1)
@@ -96,17 +96,21 @@ cord yield(state *s)
                 s->current_y = s->diag;
                 s->current_x = 1;
             }
-            if(s->diag == s->height - 1) {
+            if(s->diag == s->height - 2) {
+                s->diag--;
                 s->dir = -1;
+                s->current_y = s->height - 1;
+                s->current_x = 1;
+                next_x = s->current_x;
+                next_y = --s->current_y;
             } 
             
         }if(s->dir == -1) 
         {
-          
             if(next_y == ((s->height - 1) - s->diag)){
                 s->diag += s->dir;
-                s->current_x = (s->height) - s->diag;
-                s->current_y = (s->height - 2);
+                s->current_x = (s->height) - s->diag - 2;
+                s->current_y = (s->height - 1);
             }
 
         }    

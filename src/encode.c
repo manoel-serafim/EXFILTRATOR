@@ -125,7 +125,6 @@ void embed(const char * img_path, const char * file_path, const char * output_na
 
     state s = {.mode = mode};
     init(&s, image->width, image->height);
-    //FILE * debug_encode = fopen("debug_encode.txt", "w");
     int data_embedded = 0;
     double highest_var = max_var(image);
     // Process each pixel
@@ -136,7 +135,6 @@ void embed(const char * img_path, const char * file_path, const char * output_na
         if(s.status == -1) break;
         int y = c.y;
         int x = c.x;
-        //fprintf(debug_encode, "x: %d, y:%d\n", c.x, c.y);
          //will not use all bits for variance check , there will be canary bits
         // use only the Xth MSB
         BYTE window[3][3][3]; // 3x3 2D grid of pixels x3 for each pixel in each grid square
